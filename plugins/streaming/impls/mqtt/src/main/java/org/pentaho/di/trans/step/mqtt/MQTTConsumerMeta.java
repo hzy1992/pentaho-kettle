@@ -29,6 +29,7 @@ import org.pentaho.di.core.injection.Injection;
 import org.pentaho.di.core.injection.InjectionSupported;
 import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.core.row.value.ValueMetaBase;
 import org.pentaho.di.core.row.value.ValueMetaString;
 import org.pentaho.di.core.util.serialization.Sensitive;
@@ -52,6 +53,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
+import static org.pentaho.di.core.row.ValueMetaInterface.TYPE_STRING;
+import static org.pentaho.di.core.row.ValueMetaInterface.getTypeDescription;
 import static org.pentaho.di.core.util.serialization.ConfigHelper.conf;
 import static org.pentaho.di.i18n.BaseMessages.getString;
 import static org.pentaho.di.trans.step.mqtt.MQTTClientBuilder.DEFAULT_SSL_OPTS;
@@ -94,7 +97,7 @@ import static org.pentaho.metaverse.api.analyzer.kettle.step.ExternalResourceSte
   name = "MQTTConsumer.TypeLongDesc",
   description = "MQTTConsumer.TypeTooltipDesc",
   categoryDescription = "i18n:org.pentaho.di.trans.step:BaseStep.Category.Streaming",
-  documentationUrl = "Products/Data_Integration/Transformation_Step_Reference/MQTT_Consumer" )
+  documentationUrl = "Products/MQTT_Consumer" )
 @InjectionSupported ( localizationPrefix = "MQTTConsumerMeta.Injection.", groups = { "SSL" } )
 @Metaverse.CategoryMap ( entity = MQTT_TOPIC_METAVERSE, category = CATEGORY_MESSAGE_QUEUE )
 @Metaverse.CategoryMap ( entity = MQTT_SERVER_METAVERSE, category = CATEGORY_DATASOURCE )
@@ -164,6 +167,9 @@ public class MQTTConsumerMeta extends BaseStreamStepMeta implements StepMetaInte
   @Injection ( name = AUTOMATIC_RECONNECT )
   private String automaticReconnect = "";
 
+  @Injection( name = MESSAGE_DATA_TYPE )
+  public String messageDataType = getTypeDescription( TYPE_STRING );
+
   public MQTTConsumerMeta() {
     super();
     setSpecificationMethod( ObjectLocationSpecificationMethod.FILENAME );
@@ -191,6 +197,12 @@ public class MQTTConsumerMeta extends BaseStreamStepMeta implements StepMetaInte
     serverUris = "";
     mqttVersion = "";
     automaticReconnect = "";
+    messageDataType = getTypeDescription( TYPE_STRING );
+  }
+
+  @Override
+  public int getMessageDataType() {
+    return ValueMetaInterface.getTypeCode( messageDataType );
   }
 
   @Override public String getFileName() {
@@ -201,7 +213,7 @@ public class MQTTConsumerMeta extends BaseStreamStepMeta implements StepMetaInte
   @Override
   public RowMeta getRowMeta( String origin, VariableSpace space ) {
     RowMeta rowMeta = new RowMeta();
-    rowMeta.addValueMeta( new ValueMetaBase( msgOutputName, messageDataType ) );
+    rowMeta.addValueMeta( new ValueMetaBase( msgOutputName, getMessageDataType() ) );
     rowMeta.addValueMeta( new ValueMetaString( topicOutputName ) );
     return rowMeta;
   }

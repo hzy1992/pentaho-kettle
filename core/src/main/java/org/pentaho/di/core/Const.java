@@ -1126,6 +1126,9 @@ public class Const {
   // See PDI-17203 for details
   public static final String KETTLE_COMPATIBILITY_XML_OUTPUT_NULL_VALUES = "KETTLE_COMPATIBILITY_XML_OUTPUT_NULL_VALUES";
 
+  // See PDI-17980 for details
+  public static final String KETTLE_COMPATIBILITY_USE_JDBC_METADATA = "KETTLE_COMPATIBILITY_USE_JDBC_METADATA";
+
   /**
    * The XML file that contains the list of native import rules
    */
@@ -1290,6 +1293,13 @@ public class Const {
    * <p>This environment variable is used by streaming consumer steps to limit the total of concurrent batches across transformations.</p>
    */
   public static final String SHARED_STREAMING_BATCH_POOL_SIZE = "SHARED_STREAMING_BATCH_POOL_SIZE";
+
+  /**
+   * <p>This environment variable is used by XSD validation steps to enable or disable external entities.</p>
+   * <p>By default external entities are allowed.</p>
+   */
+  public static final String ALLOW_EXTERNAL_ENTITIES_FOR_XSD_VALIDATION = "ALLOW_EXTERNAL_ENTITIES_FOR_XSD_VALIDATION";
+  public static final String ALLOW_EXTERNAL_ENTITIES_FOR_XSD_VALIDATION_DEFAULT = "true";
 
   /**
    * rounds double f to any number of places after decimal point Does arithmetic using BigDecimal class to avoid integer
