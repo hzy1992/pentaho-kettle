@@ -1381,7 +1381,7 @@ public class Database implements VariableSpace, LoggingObjectInterface {
    *
    * @param ps             The prepared statement to empty and close.
    * @param batch          true if you are using batch processing
-   * @param psBatchCounter The number of rows on the batch queue
+   * @param batchCounter The number of rows on the batch queue
    * @throws KettleDatabaseException
    */
   public void emptyAndCommit( PreparedStatement ps, boolean batch, int batchCounter ) throws KettleDatabaseException {
@@ -1989,7 +1989,7 @@ public class Database implements VariableSpace, LoggingObjectInterface {
   /**
    * Retrieves the columns metadata matching the schema and table name.
    *
-   * @param shema
+   * @param schema
    *          the schema name pattern
    * @param table
    *          the table name pattern
@@ -4900,6 +4900,43 @@ public class Database implements VariableSpace, LoggingObjectInterface {
       } catch ( SQLException e ) {
         throw new KettleDatabaseException( "Error closing connection while searching primary keys in table ["
           + tablename + "]", e );
+      }
+    }
+    return names.toArray( new String[ names.size() ] );
+  }
+
+  /**
+   * Return primary key column names ...
+   *
+   * @param schema
+   * @param tablename
+   * @throws KettleDatabaseException
+   */
+  public String[] getPrimaryKeyColumnNames( String schema, String tablename ) throws KettleDatabaseException {
+    List<String> names = new ArrayList<String>();
+    ResultSet allkeys = null;
+    try {
+      allkeys = getDatabaseMetaData().getPrimaryKeys( null, schema, tablename );
+      while ( allkeys.next() ) {
+        String keyname = allkeys.getString( "PK_NAME" );
+        String col_name = allkeys.getString( "COLUMN_NAME" );
+        if ( !names.contains( col_name ) ) {
+          names.add( col_name );
+        }
+        if ( log.isRowLevel() ) {
+          log.logRowlevel( toString(), "getting key : " + keyname + " on column " + col_name );
+        }
+      }
+    } catch ( SQLException e ) {
+      log.logError( toString(), "Error getting primary keys columns from table [" + tablename + "]" );
+    } finally {
+      try {
+        if ( allkeys != null ) {
+          allkeys.close();
+        }
+      } catch ( SQLException e ) {
+        throw new KettleDatabaseException( "Error closing connection while searching primary keys in table ["
+                + tablename + "]", e );
       }
     }
     return names.toArray( new String[ names.size() ] );

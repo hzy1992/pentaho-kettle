@@ -25,19 +25,8 @@ package org.pentaho.di.core.row.value;
 
 import org.pentaho.di.compatibility.Value;
 import org.pentaho.di.core.Const;
-import org.pentaho.di.core.database.DatabaseInterface;
-import org.pentaho.di.core.database.DatabaseMeta;
-import org.pentaho.di.core.database.GreenplumDatabaseMeta;
-import org.pentaho.di.core.database.NetezzaDatabaseMeta;
-import org.pentaho.di.core.database.OracleDatabaseMeta;
-import org.pentaho.di.core.database.PostgreSQLDatabaseMeta;
-import org.pentaho.di.core.database.SQLiteDatabaseMeta;
-import org.pentaho.di.core.database.TeradataDatabaseMeta;
-import org.pentaho.di.core.exception.KettleDatabaseException;
-import org.pentaho.di.core.exception.KettleEOFException;
-import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.exception.KettleFileException;
-import org.pentaho.di.core.exception.KettleValueException;
+import org.pentaho.di.core.database.*;
+import org.pentaho.di.core.exception.*;
 import org.pentaho.di.core.gui.PrimitiveGCInterface;
 import org.pentaho.di.core.logging.KettleLogStore;
 import org.pentaho.di.core.logging.LogChannelInterface;
@@ -49,36 +38,15 @@ import org.pentaho.di.core.xml.XMLHandler;
 import org.pentaho.di.i18n.BaseMessages;
 import org.w3c.dom.Node;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.nio.charset.Charset;
-import java.sql.Blob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.text.Collator;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
+import java.sql.*;
+import java.text.*;
+import java.util.*;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class ValueMetaBase implements ValueMetaInterface {
 
@@ -4710,7 +4678,6 @@ public class ValueMetaBase implements ValueMetaInterface {
       int precision = -1;
       int valtype = ValueMetaInterface.TYPE_NONE;
       boolean isClob = false;
-
       int type = rm.getColumnType( index );
       boolean signed = false;
       try {
@@ -4979,13 +4946,13 @@ public class ValueMetaBase implements ValueMetaInterface {
 
     // DISABLED FOR PERFORMANCE REASONS : PDI-1788
     //
-    // boolean originalAutoIncrement=rm.isAutoIncrement(index); DISABLED FOR
+     boolean originalAutoIncrement=rm.isAutoIncrement(index);
     // PERFORMANCE REASONS : PDI-1788
-    // v.setOriginalAutoIncrement(originalAutoIncrement);
+     v.setOriginalAutoIncrement(originalAutoIncrement);
 
-    // int originalNullable=rm.isNullable(index); DISABLED FOR PERFORMANCE
+     int originalNullable=rm.isNullable(index);
     // REASONS : PDI-1788
-    // v.setOriginalNullable(originalNullable);
+     v.setOriginalNullable(originalNullable);
     //
 
     boolean originalSigned = false;
@@ -5016,7 +4983,7 @@ public class ValueMetaBase implements ValueMetaInterface {
       int precision = -1;
       int valtype = ValueMetaInterface.TYPE_NONE;
       boolean isClob = false;
-
+      int originalNullable = rs.getInt("NULLABLE");
       switch ( originalColumnType ) {
         case java.sql.Types.CHAR:
         case java.sql.Types.VARCHAR:
@@ -5224,7 +5191,7 @@ public class ValueMetaBase implements ValueMetaInterface {
       v.setOriginalPrecision( originalPrecision );
       v.setOriginalScale( originalScale );
       v.setOriginalSigned( originalSigned );
-
+      v.setOriginalNullable(originalNullable);
       return v;
     } catch ( Exception e ) {
       throw new KettleDatabaseException( "Error determining value metadata from SQL resultset metadata", e );
