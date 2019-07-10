@@ -225,4 +225,9 @@
     <classname>org.pentaho.di.core.database.SnowflakeHVDatabaseMeta</classname>
   </database-type>
 
+  <database-type id="DM">
+    <description>DaMeng database</description>
+    <classname>org.pentaho.di.core.database.DMDatabaseMeta</classname>
+  </database-type>
+
  </database-types>
